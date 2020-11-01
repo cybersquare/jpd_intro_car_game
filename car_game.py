@@ -34,7 +34,7 @@ class Enemy(pygame.sprite.Sprite): # Enemy car(Red)
         if collided: # Pause the game for 2 second if collided
             time.sleep(2)
         self.rect.move_ip(0,10)
-        # Strat a new enmey if collided or crosses the window
+        # Start a new enemy if collided or crosses the window
         if self.rect.bottom > 600 or collided: 
             self.rect.top = 0
             self.rect.center = (random.randint(30, 370), 0)
