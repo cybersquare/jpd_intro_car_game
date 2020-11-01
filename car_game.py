@@ -1,27 +1,27 @@
-import pygame, sys
+import pygame
 from pygame.locals import *
-import random
+import random, time
+
 #Initializing
 pygame.init()
-#Setting up FPS  
-FPS = 60
+
+collided = False
+score = 0
+
+#Setting up FPS to limit the number of executions per second
+FPS = 60 # Execute the loop 60 times a second
 FramePerSec = pygame.time.Clock()
+
 #Creating colors 
-BLUE  = (0, 0, 255)
 RED   = (255, 0, 0)
-GREEN = (0, 255, 0)
-BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
-#Other Variables for use in the program
-SCREEN_WIDTH = 400
-SCREEN_HEIGHT = 600
-SPEED = 5
+
 #Create a white screen  
 DISPLAYSURF = pygame.display.set_mode((400,600))
 SCREEN_WIDTH = 600
-DISPLAYSURF.fill(WHITE)
 pygame.display.set_caption("Game")
-class Enemy(pygame.sprite.Sprite):
+
+class Enemy(pygame.sprite.Sprite): # Enemy car(Red)
     def __init__(self):
         super().__init__() 
         self.image = pygame.image.load("enemy.png")
@@ -29,23 +29,30 @@ class Enemy(pygame.sprite.Sprite):
         self.rect = self.surf.get_rect(center = (random.randint(40, 360),0))     
  
     def move(self):
+        global collided
+        global score
+        if collided: # Pause the game for 2 second if collided
+            time.sleep(2)
         self.rect.move_ip(0,10)
-        if (self.rect.bottom > 600):
+        # Strat a new enmey if collided or crosses the window
+        if self.rect.bottom > 600 or collided: 
             self.rect.top = 0
             self.rect.center = (random.randint(30, 370), 0)
- 
+            collided = False
+            score += 1
+        
     def draw(self, surface):
         surface.blit(self.image, self.rect) 
  
  
-class Player(pygame.sprite.Sprite):
+class Player(pygame.sprite.Sprite): # Player car(Blue)
     def __init__(self):
         super().__init__() 
         self.image = pygame.image.load("Player.png")
         self.surf = pygame.Surface((50, 100))
         self.rect = self.surf.get_rect(center = (150, 500))
 
-    def update(self):
+    def update(self): # Move player on keypress
         pressed_keys = pygame.key.get_pressed()
         if self.rect.left > 0:
               if pressed_keys[K_LEFT]:
@@ -62,18 +69,34 @@ P1 = Player()
 E1 = Enemy()
 
 #Creating Sprites Groups
+enemies = pygame.sprite.Group()
+enemies.add(E1)
+
 while True:     
+    # Quit game on pressing the close button
     for event in pygame.event.get():              
-        if event.type == QUIT:
+        if event.type == pygame.QUIT:
             pygame.quit()
-            sys.exit()
+
     P1.update()
     E1.move()
-     
     DISPLAYSURF.fill(WHITE)
+    
+    # To be run if collision occurs between Player and Enemy
+    if pygame.sprite.spritecollideany(P1, enemies):
+        DISPLAYSURF.fill(RED)
+        collided = True
+        score = 0
+        
     P1.draw(DISPLAYSURF)
     E1.draw(DISPLAYSURF)
     
-    pygame.display.update()
-    FramePerSec.tick(FPS)
+    # Display score
+    font = pygame.font.Font(None, 24)
+    scoretext = font.render('Score: '+str(score), True, (0,0,0))
+    textRect = scoretext.get_rect()
+    textRect.topleft=[20,10]
+    DISPLAYSURF.blit(scoretext, textRect)
 
+    pygame.display.update()
+    FramePerSec.tick(FPS) 
