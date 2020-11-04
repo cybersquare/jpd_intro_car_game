@@ -17,7 +17,7 @@ RED   = (255, 0, 0)
 WHITE = (255, 255, 255)
 
 #Create a white screen  
-DISPLAYSURF = pygame.display.set_mode((400,600))
+screen = pygame.display.set_mode((400,600))
 SCREEN_WIDTH = 600
 pygame.display.set_caption("Game")
 
@@ -80,23 +80,23 @@ while True:
 
     P1.update()
     E1.move()
-    DISPLAYSURF.fill(WHITE)
+    screen.fill(WHITE)
     
     # To be run if collision occurs between Player and Enemy
     if pygame.sprite.spritecollideany(P1, enemies):
-        DISPLAYSURF.fill(RED)
+        screen.fill(RED)
         collided = True
         score = 0
         
-    P1.draw(DISPLAYSURF)
-    E1.draw(DISPLAYSURF)
+    P1.draw(screen)
+    E1.draw(screen)
     
     # Display score
     font = pygame.font.Font(None, 24)
     scoretext = font.render('Score: '+str(score), True, (0,0,0))
     textRect = scoretext.get_rect()
     textRect.topleft=[20,10]
-    DISPLAYSURF.blit(scoretext, textRect)
+    screen.blit(scoretext, textRect)
 
     pygame.display.update()
     FramePerSec.tick(FPS) 
